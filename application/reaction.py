@@ -1,5 +1,7 @@
+"""Core Flask app routes."""
 from flask import Flask, render_template, url_for
-app = Flask(__name__)
+from flask import current_app as app
+#app = Flask(__name__)
 
 @app.route("/")
 @app.route("/home")
@@ -14,9 +16,9 @@ def overview():
 def twitter():
     return render_template('twitter.html', title='Twitter')
 
-@app.route("/redit")
-def redit():
-    return render_template('redit.html', title='Redit')
+@app.route("/reddit")
+def reddit():
+    return render_template('reddit.html', title='Reddit')
 
 @app.route("/youtube")
 def youtube():
