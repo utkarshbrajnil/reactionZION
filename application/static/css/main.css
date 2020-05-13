@@ -1684,6 +1684,7 @@ input, select, textarea {
 		padding: 1em 2.35em 1em 2.35em;
 		font-size: 1.1em;
 		max-width: 24em;
+		top: 1em
 	}
 
 		input[type="button"]:hover,
@@ -2031,7 +2032,7 @@ input, select, textarea {
 
 	#nav {
 		background-color: #282828;
-		text-align: center;
+		text-align: right;
 		position: fixed;
 		left: 0;
 		top: 0;
@@ -2041,6 +2042,32 @@ input, select, textarea {
 		height: 3.5em;
 		line-height: 3.5em;
 	}
+
+	#nav b {
+		padding-left: 0;
+		display: inline-block;
+		left: 1.25em;
+		top: 0.5em;
+		position: absolute;
+		height: inherit;
+		line-height: inherit;
+		margin: 0;
+
+
+	}
+
+	#nav c {
+		padding-left: 0;
+		display: inline-block;
+		bottom: 0.1em;
+		position: absolute;
+		height: inherit;
+		line-height: inherit;
+		margin: 0;
+		right: 1em;
+		}
+
+
 
 		#nav ul {
 			margin-bottom: 0;
@@ -2303,6 +2330,8 @@ input, select, textarea {
 					font-size: 1.2em;
 					letter-spacing: 0;
 				}
+
+
 
 		/* Social */
 

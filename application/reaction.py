@@ -8,6 +8,11 @@ from flask import current_app as app
 def home():
     return render_template('home.html')
 
+@app.route("/about")
+def about():
+    return render_template('about.html', title='About')
+
+
 @app.route("/overview")
 def overview():
     return render_template('overview.html', title='Overview')
@@ -24,6 +29,9 @@ def reddit():
 def youtube():
     return render_template('youtube.html', title='Youtube')
 
+@app.route("/analyse")
+def analyse():
+    return render_template('analyse.html', title='Analyse')
 
 
 
