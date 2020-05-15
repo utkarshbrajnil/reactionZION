@@ -1,8 +1,15 @@
 """Core Flask app routes."""
-from flask import Flask, render_template, url_for
-from flask import current_app as app
-#app = Flask(__name__)
 
+from flask import Flask, render_template, url_for, redirect, flash
+from flask import current_app as app
+from flask_wtf import FlaskForm
+from wtforms import StringField,SubmitField
+from wtforms.validators import DataRequired
+from ytmain import ytload
+
+
+#app = Flask(__name__)
+app.config['SECRET_KEY'] = 'acbsd'
 @app.route("/")
 @app.route("/home")
 def home():
@@ -29,9 +36,20 @@ def reddit():
 def youtube():
     return render_template('youtube.html', title='Youtube')
 
-@app.route("/analyse")
+@app.route("/analyse", methods=['GET','POST'])
 def analyse():
-    return render_template('analyse.html', title='Analyse')
+    class inputform(FlaskForm):
+        query=StringField('Enter the term you want to analyse.', validators=[DataRequired()])
+        submit= SubmitField('Create Dashboard')
+
+    form=inputform()
+    if form.is_submitted():
+        ytload(query)
+        flash(f'Please wait while we create your dashboard for {form.query.data}!','success')
+        return redirect(url_for('home'))
+    return render_template('analyse.html', title='Analyse',form=form)
+
+
 
 
 

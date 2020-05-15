@@ -5,7 +5,16 @@ import dash
 import dash_table
 import dash_html_components as html
 import dash_core_components as dcc
+from dash.dependencies import Input, Output
 from .layout import html_layout
+
+app_colors = {
+    'background': '#0C0F0A',
+    'text': '#FFFFFF',
+    'sentiment-plot':'#41EAD4',
+    'volume-bar':'#FBFC74',
+    'someothercolor':'#FF206E',
+}
 
 
 def create_dashboard(server):
@@ -23,11 +32,16 @@ def create_dashboard(server):
     df.replace(to_remove, np.nan, inplace=True)
 
     # Custom HTML layout
-    dash_app.index_string = html_layout
+    #dash_app.index_string = html_layout
 
     # Create Layout
     dash_app.layout = html.Div(
-        children=[dcc.Graph(
+        children=[html.Div(className='container-fluid', children=[html.H2('Live Sentiment Analysis', style={'color':"#CECECE"}),
+                                                        html.H3('Search:', style={'color':app_colors['text']}),
+                                                  dcc.Input(id='sentiment_term',placeholder='Enter the text', value='', type='text', style={'color':app_colors['someothercolor']}),
+                                                  ],
+                 style={'width':'98%','margin-left':10,'margin-right':10,'max-width':50000}),
+            dcc.Graph(
             id='histogram-graph',
             figure={
                 'data': [
@@ -45,8 +59,10 @@ def create_dashboard(server):
                     'padding': 150
                 }
             }),
+
             create_data_table(df)
             ],
+            style={'backgroundColor': app_colors['background'], 'margin-top':'-30px', 'height':'2000px',},
         id='dash-container'
     )
     return dash_app.server

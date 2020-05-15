@@ -9,6 +9,7 @@ def create_app():
 
     with app.app_context():
         # Import Flask routes
+
         from application import reaction
 
         # Import Dash application
