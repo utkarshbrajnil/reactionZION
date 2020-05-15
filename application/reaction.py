@@ -41,7 +41,7 @@ def youtube():
 def analyse():
     class inputform(FlaskForm):
         query=StringField('Enter the term you want to analyse.', validators=[DataRequired()])
-        submit= SubmitField('Create Dashboard')
+        submit= SubmitField('Gather Data')
 
     form=inputform()
     if form.is_submitted():

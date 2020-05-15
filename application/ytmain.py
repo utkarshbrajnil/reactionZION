@@ -72,9 +72,9 @@ def ytload(query):
     maindf.insert(0, 'id', range(0, len(maindf)))
 
     f_list=maindf['comments'].to_list()
-    for l in f_list:
+    '''for l in f_list:
         if(l=="[removed]" or l=="[deleted]"):
-            f_list.append(0)
+            f_list.append(0)'''
 
     negative=0.0
     positive=0.0
