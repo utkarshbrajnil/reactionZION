@@ -7,6 +7,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
 from .layout import html_layout
+import sqlite3
 
 app_colors = {
     'background': '#0C0F0A',
@@ -25,36 +26,35 @@ def create_dashboard(server):
                                                'https://fonts.googleapis.com/css?family=Lato']
                          )
 
+    #connect to the main database
+    conn = sqlite3.connect('data/alldata.db', isolation_level=None, check_same_thread=False)
+    c = conn.cursor()
+
     # Prepare a DataFrame
-    df = pd.read_csv('data/311-calls.csv', parse_dates=['created_date'])
-    num_complaints = df['complaint_type'].value_counts()
-    to_remove = num_complaints[num_complaints <= 20].index
-    df.replace(to_remove, np.nan, inplace=True)
+    df = pd.read_sql('select * from sentiment', conn)
+    df['date'] = pd.to_datetime(df['unix'])
+    num_entries = df['id'].value_counts()
+
 
     # Custom HTML layout
     #dash_app.index_string = html_layout
 
     # Create Layout
     dash_app.layout = html.Div(
-        children=[html.Div(className='container-fluid', children=[html.H2('Live Sentiment Analysis', style={'color':"#CECECE"}),
-                                                        html.H3('Search:', style={'color':app_colors['text']}),
-                                                  dcc.Input(id='sentiment_term',placeholder='Enter the text', value='', type='text', style={'color':app_colors['someothercolor']}),
-                                                  ],
-                 style={'width':'98%','margin-left':10,'margin-right':10,'max-width':50000}),
-            dcc.Graph(
+        children=[dcc.Graph(
             id='histogram-graph',
             figure={
                 'data': [
                     {
-                        'x': df['complaint_type'],
-                        'text': df['complaint_type'],
-                        'customdata': df['unique_key'],
-                        'name': '311 Calls by region.',
+                        #'x': df['date'],
+                        'y': df['sentiment'],
+                        'text': df['date'],
+                        'name': 'YOUTUBE sentiment analysis.',
                         'type': 'histogram'
                     }
                 ],
                 'layout': {
-                    'title': 'NYC 311 Calls category.',
+                    'title': 'YOUTUBE sentiment analysis.',
                     'height': 600,
                     'padding': 150
                 }
@@ -62,7 +62,7 @@ def create_dashboard(server):
 
             create_data_table(df)
             ],
-            style={'backgroundColor': app_colors['background'], 'margin-top':'-30px', 'height':'2000px',},
+
         id='dash-container'
     )
     return dash_app.server

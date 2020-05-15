@@ -1,5 +1,7 @@
 """Initialize Flask app."""
 from flask import Flask
+import sqlite3
+
 
 
 def create_app():
@@ -14,6 +16,9 @@ def create_app():
 
         # Import Dash application
         from application.plotlydash.dashboard import create_dashboard
+        conn = sqlite3.connect('data/alldata.db', isolation_level=None, check_same_thread=False)
+        c = conn.cursor()
+        c.execute("CREATE TABLE IF NOT EXISTS sentiment(id INTEGER PRIMARY KEY AUTOINCREMENT, unix INTEGER, comments TEXT, sentiment REAL)")
         app = create_dashboard(app)
 
         # Compile CSS

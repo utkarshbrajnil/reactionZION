@@ -5,7 +5,8 @@ from flask import current_app as app
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
 from wtforms.validators import DataRequired
-from ytmain import ytload
+
+from application.ytmain import ytload
 
 
 #app = Flask(__name__)
@@ -44,8 +45,8 @@ def analyse():
 
     form=inputform()
     if form.is_submitted():
-        ytload(query)
-        flash(f'Please wait while we create your dashboard for {form.query.data}!','success')
+        ytload(form.query.data)
+        flash(f'Almost done! Now CLICK on Dashboard to start creating your analytics dashboard for {form.query.data}.','success')
         return redirect(url_for('home'))
     return render_template('analyse.html', title='Analyse',form=form)
 

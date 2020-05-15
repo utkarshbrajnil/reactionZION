@@ -42,11 +42,11 @@ def ct_yt(vid):
     for x in resp['items']:
         A=[x['snippet']['topLevelComment']['snippet']['publishedAt'],x['snippet']['topLevelComment']['snippet']['textDisplay']]
         com.append(A)
-    df=pd.DataFrame(com,columns = ['unix','tweets'])
+    df=pd.DataFrame(com,columns = ['unix','comments'])
     return df
 
 def allvidcom(videoid_list):
-    maindf = pd.DataFrame(columns = ['unix','tweets'])
+    maindf = pd.DataFrame(columns = ['unix','comments'])
     for i in videoid_list:
         df2 = ct_yt(i)
         maindf = maindf.append(df2, ignore_index = True)
