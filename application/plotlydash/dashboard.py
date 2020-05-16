@@ -9,8 +9,7 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 from .layout import html_layout
 import sqlite3
-from pyorbital.orbital import Orbital
-satellite = Orbital('TERRA')
+import plotly.express as px
 
 app_colors = {
     'background': '#0C0F0A',
@@ -38,6 +37,16 @@ def create_dashboard(server):
     df = pd.read_sql('select * from sentiment', conn)
     df['date'] = pd.to_datetime(df['unix'])
     num_entries = df['id'].value_counts()
+    pol=list()
+    f_list=df['sentiment'].to_list()
+    for l in f_list:
+        if(l>0):
+            pol.append(1)
+        if(l<0):
+            pol.append(-1)
+        if(l==0):
+            pol.append(0)
+    df['polarity']=pol
 
     twdf = pd.read_sql('select * from twsentiment', conn)
     #twdf['date'] = pd.to_datetime(df['unix'])
@@ -48,44 +57,83 @@ def create_dashboard(server):
 
     # Create Layout
     dash_app.layout = html.Div(
-        children=[dcc.Graph(
-            id='histogram-graph',
-            figure={
-                'data': [
-                    {
-                        #'x': df['date'],
-                        'y': df['sentiment'],
-                        'text': df['date'],
-                        'name': 'YOUTUBE sentiment analysis.',
-                        'type': 'histogram'
-                    }
-                ],
-                'layout': {
-                    'title': 'YOUTUBE sentiment analysis.',
-                    'height': 600,
-                    'padding': 150
-                }
-            }),
-            dcc.Graph(
-                id='line-graph',
-                figure={
-                    'data': [
-                        {
-                            #'x': df['date'],
-                            'y': twdf['sentiment'],
-                            #'text': twdf['date'],
-                            'name': 'twitter sentiment analysis.',
-                            'type': 'histogram'
+        children=[
+
+            html.Div(
+                dcc.Graph(
+                    id='line-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.line(df,
+                                   x='date',
+                                   y='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':600}
+                )
+            ),
+
+             html.Div(
+                dcc.Graph(
+                    id='bar-graph',
+                    figure={
+                        'data': [
+                            {
+                                'x': df['date'],
+                                'y': df['sentiment'],
+                                'name': 'YOUTUBE sentiment analysis',
+                                'type': 'bar'
+                            }
+                         ],
+                        'layout': {
+                                'title': 'YOUTUBE sentiment analysis.',
+                                'height': 600,
+                                'padding': 150
                         }
-                    ],
-                    'layout': {
-                        'title': 'twitter sentiment analysis.',
-                        'height': 600,
-                        'padding': 150
-                    }
-                }),
-            create_data_table(df),
-            dcc.Interval(id='refresh', interval=200)
+                    }),
+                ),
+
+                html.Div(
+                dcc.Graph(
+                    id='histo-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.histogram(df,
+                                   y='date',
+                                   x='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':600}
+                )
+            ),
+
+            html.Div(
+                dcc.Graph(
+                    id='scatter-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.scatter(df,
+                                   x='date',
+                                   y='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':600}
+                )
+            ),
+
+            html.Div(
+                dcc.Graph(
+                    id='pie-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.pie(df,
+                                   values='sentiment',
+                                   names='polarity',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':1200}
+                )
+            ),
 
             ],
 

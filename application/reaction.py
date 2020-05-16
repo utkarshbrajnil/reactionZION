@@ -49,12 +49,12 @@ def analyse():
 
     form=inputform()
     if form.is_submitted():
-        twload(form.query.data)
-        #ytload(form.query.data)
-        if __name__ == '__main__':
-            p = Process(target=twload, args=(form.query.data,))
-            p.start()
-            p.join()
+        #twload(form.query.data)
+        ytload(form.query.data)
+        #if __name__ == '__main__':
+        #    p = Process(target=twload, args=(form.query.data,))
+        #    p.start()
+        #    p.join()
         app = create_app()
         if __name__ == "__main__":
             app.run(debug=True)
