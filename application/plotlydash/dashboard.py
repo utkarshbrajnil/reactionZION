@@ -1,4 +1,5 @@
 """Instantiate a Dash app."""
+import datetime
 import numpy as np
 import pandas as pd
 import dash
@@ -8,6 +9,8 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 from .layout import html_layout
 import sqlite3
+from pyorbital.orbital import Orbital
+satellite = Orbital('TERRA')
 
 app_colors = {
     'background': '#0C0F0A',
@@ -20,6 +23,7 @@ app_colors = {
 
 def create_dashboard(server):
     """Create a Plotly Dash dashboard."""
+
     dash_app = dash.Dash(server=server,
                          routes_pathname_prefix='/dashapp/',
                          external_stylesheets=['/static/dist/css/styles.css',
@@ -35,6 +39,9 @@ def create_dashboard(server):
     df['date'] = pd.to_datetime(df['unix'])
     num_entries = df['id'].value_counts()
 
+    twdf = pd.read_sql('select * from twsentiment', conn)
+    #twdf['date'] = pd.to_datetime(df['unix'])
+    num_entries = twdf['id'].value_counts()
 
     # Custom HTML layout
     #dash_app.index_string = html_layout
@@ -59,12 +66,34 @@ def create_dashboard(server):
                     'padding': 150
                 }
             }),
+            dcc.Graph(
+                id='line-graph',
+                figure={
+                    'data': [
+                        {
+                            #'x': df['date'],
+                            'y': twdf['sentiment'],
+                            #'text': twdf['date'],
+                            'name': 'twitter sentiment analysis.',
+                            'type': 'histogram'
+                        }
+                    ],
+                    'layout': {
+                        'title': 'twitter sentiment analysis.',
+                        'height': 600,
+                        'padding': 150
+                    }
+                }),
+            create_data_table(df),
+            dcc.Interval(id='refresh', interval=200)
 
-            create_data_table(df)
             ],
 
-        id='dash-container'
+        id='dash-container',
+
+
     )
+
     return dash_app.server
 
 
@@ -79,3 +108,6 @@ def create_data_table(df):
         page_size=300
     )
     return table
+
+'''@dash_app.callback(Output('dash-container', 'children'),
+                  [Input('interval-component', 'n_intervals')])'''

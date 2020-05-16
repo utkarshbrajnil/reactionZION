@@ -48,7 +48,10 @@ def ct_yt(vid):
 def allvidcom(videoid_list):
     maindf = pd.DataFrame(columns = ['unix','comments'])
     for i in videoid_list:
-        df2 = ct_yt(i)
-        maindf = maindf.append(df2, ignore_index = True)
-        maindf.sort_values(by=['unix'], inplace=True, ascending=False)
+        try:
+            df2 = ct_yt(i)
+            maindf = maindf.append(df2, ignore_index = True)
+            maindf.sort_values(by=['unix'], inplace=True, ascending=False)
+        except:
+            continue
     return maindf

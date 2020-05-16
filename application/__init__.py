@@ -19,6 +19,7 @@ def create_app():
         conn = sqlite3.connect('data/alldata.db', isolation_level=None, check_same_thread=False)
         c = conn.cursor()
         c.execute("CREATE TABLE IF NOT EXISTS sentiment(id INTEGER PRIMARY KEY AUTOINCREMENT, unix INTEGER, comments TEXT, sentiment REAL)")
+        c.execute("CREATE TABLE IF NOT EXISTS twsentiment(id INTEGER PRIMARY KEY AUTOINCREMENT, screen name TEXT, timestamp TIMESTAMP, text TEXT, likes INTEGER, retweets INTEGER, replies INTEGER)")
         app = create_dashboard(app)
 
         # Compile CSS
@@ -26,4 +27,13 @@ def create_app():
             from application.assets import compile_assets
             compile_assets(app)
 
+
+
         return app
+
+def reload_app():
+    """Construct core Flask application with embedded Dash app."""
+    app = Flask(__name__, instance_relative_config=False)
+    from application.plotlydash.dashboard import create_dashboard
+    app = create_dashboard(app)
+    return app

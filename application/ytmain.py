@@ -9,6 +9,9 @@ from application.yt_advsearch import search_vidid,allvidcom
 from apiclient.discovery import build
 from rfc3339 import rfc3339
 
+import datetime as dt
+import pandas as pd
+from twitterscraper import query_tweets
 
 import json
 import sqlite3
@@ -24,6 +27,77 @@ import string
 import pickle
 import itertools
 #from textblob import TextBlob
+
+
+def twload(ipstr):
+    ytload(ipstr)
+    analyzer = SentimentIntensityAnalyzer()
+
+    conn = sqlite3.connect('data/alldata.db', isolation_level=None, check_same_thread=False)
+    c = conn.cursor()
+
+    def create_table():
+        try:
+            c.execute("PRAGMA journal_mode=wal")
+            c.execute("PRAGMA wal_checkpoint=TRUNCATE")
+
+            c.execute("CREATE TABLE IF NOT EXISTS twsentiment(id INTEGER PRIMARY KEY AUTOINCREMENT, screen name TEXT, timestamp TIMESTAMP, text TEXT, likes INTEGER, retweets INTEGER, replies INTEGER)")
+
+        except Exception as e:
+            print(str(e))
+
+    create_table()
+
+    two_months = dt.timedelta(days=60)
+    end_date = dt.date.today()
+    begin_date = end_date - two_months
+
+    limit = 5000
+    lang = "english"
+
+    tweets = query_tweets(ipstr, begindate=begin_date, enddate=end_date ,limit=limit, lang=lang)
+
+    df = pd.DataFrame(t._dict_ for t in tweets)
+    df.sort_values(by=['likes','retweets','replies'], inplace=True, ascending=False)
+    #removing unwanted columns
+    df.drop(df.columns[[3,4,6,8,9,10,11,12,13,17,18,19,20]], axis = 1, inplace = True)
+    df = df[df.likes >=0]
+    df.set_index('username',inplace=True)
+
+    df.insert(0, 'id', range(0, len(df)))
+
+    f_list=df['text'].to_list()
+    for l in f_list:
+        if(l=="[removed]" or l=="[deleted]"):
+            f_list.append(0)
+
+    negative=0.0
+    positive=0.0
+    neutral=0.0
+
+    pol=list()
+
+    for l in f_list:
+        if(l!=0):
+            analysis=TextBlob(l).sentiment
+            #print (analysis)
+            if(analysis.polarity==0):
+                neutral+=1
+            elif(analysis.polarity>0):
+                positive+=1
+            elif(analysis.polarity<0):
+                negative+=1
+            t=analysis.polarity
+            pol.append(t)
+        else:
+            pol.append(0)
+            #l1=l.str.replace(l,nalysis.polarity)
+            #df['comments']=l1
+    df['sentiment']=pol
+
+    #print(maindf)
+    #c.execute('''DROP TABLE IF EXISTS youtube''')
+    df.to_sql('twsentiment', conn, if_exists='replace')
 
 def ytload(query):
     analyzer = SentimentIntensityAnalyzer()
@@ -72,9 +146,9 @@ def ytload(query):
     maindf.insert(0, 'id', range(0, len(maindf)))
 
     f_list=maindf['comments'].to_list()
-    '''for l in f_list:
+    for l in f_list:
         if(l=="[removed]" or l=="[deleted]"):
-            f_list.append(0)'''
+            f_list.append(0)
 
     negative=0.0
     positive=0.0
@@ -101,7 +175,7 @@ def ytload(query):
     maindf['sentiment']=pol
 
     #print(maindf)
-    c.execute('''DROP TABLE IF EXISTS youtube''')
+    #c.execute('''DROP TABLE IF EXISTS youtube''')
     maindf.to_sql('sentiment', conn, if_exists='replace') # - writes the pd.df to SQLIte DB
 
 

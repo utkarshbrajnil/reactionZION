@@ -5,8 +5,12 @@ from flask import current_app as app
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
 from wtforms.validators import DataRequired
-
-from application.ytmain import ytload
+from application.ytmain import ytload,twload
+from application import create_app,reload_app
+from multiprocessing import Process
+import os
+import datetime
+#from application.plotlydash.dashboard import create_dashboard
 
 
 #app = Flask(__name__)
@@ -45,9 +49,18 @@ def analyse():
 
     form=inputform()
     if form.is_submitted():
-        ytload(form.query.data)
+        twload(form.query.data)
+        #ytload(form.query.data)
+        if __name__ == '__main__':
+            p = Process(target=twload, args=(form.query.data,))
+            p.start()
+            p.join()
+        app = create_app()
+        if __name__ == "__main__":
+            app.run(debug=True)
         flash(f'Almost done! Now CLICK on Dashboard to start creating your analytics dashboard for {form.query.data}.','success')
         return redirect(url_for('home'))
+
     return render_template('analyse.html', title='Analyse',form=form)
 
 
