@@ -8,6 +8,7 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 from .layout import html_layout
 import sqlite3
+import plotly.express as px
 
 app_colors = {
     'background': '#0C0F0A',
@@ -34,6 +35,16 @@ def create_dashboard(server):
     df = pd.read_sql('select * from sentiment', conn)
     df['date'] = pd.to_datetime(df['unix'])
     num_entries = df['id'].value_counts()
+    pol=list()
+    f_list=df['sentiment'].to_list()
+    for l in f_list:
+        if(l>0):
+            pol.append('+ve')
+        if(l<0):
+            pol.append('-ve')
+        if(l==0):
+            pol.append('neutral')
+    df['polarity']=pol
 
 
     # Custom HTML layout
@@ -41,24 +52,83 @@ def create_dashboard(server):
 
     # Create Layout
     dash_app.layout = html.Div(
-        children=[dcc.Graph(
-            id='histogram-graph',
-            figure={
-                'data': [
-                    {
-                        #'x': df['date'],
-                        'y': df['sentiment'],
-                        'text': df['date'],
-                        'name': 'YOUTUBE sentiment analysis.',
-                        'type': 'histogram'
-                    }
-                ],
-                'layout': {
-                    'title': 'YOUTUBE sentiment analysis.',
-                    'height': 600,
-                    'padding': 150
-                }
-            }),
+        children=[
+
+            html.Div(
+                dcc.Graph(
+                    id='line-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.line(df,
+                                   x='date',
+                                   y='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':600}
+                ) 
+            ),
+
+             html.Div(
+                dcc.Graph(
+                    id='bar-graph',
+                    figure={
+                        'data': [
+                            {
+                                'x': df['date'],
+                                'y': df['sentiment'],
+                                'name': 'YOUTUBE sentiment analysis',
+                                'type': 'bar'
+                            }
+                         ],
+                        'layout': {
+                                'title': 'YOUTUBE sentiment analysis.',
+                                'height': 600,
+                                'padding': 150
+                        }       
+                    }),
+                ),
+
+                html.Div(
+                dcc.Graph(
+                    id='histo-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.histogram(df,
+                                   y='date',
+                                   x='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':600}
+                ) 
+            ),
+
+            html.Div(
+                dcc.Graph(
+                    id='scatter-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.scatter(df,
+                                   x='date',
+                                   y='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':600}
+                ) 
+            ),
+
+            html.Div(
+                dcc.Graph(
+                    id='pie-graph',
+                    config={'displayModeBar': False},
+                    animate= True,
+                    figure=px.pie(df,
+                                   values='sentiment',
+                                   names='sentiment',
+                                   title='YOUTUBE sentiment analysis',
+                                   ),
+                    style={'padding': 25, 'height':1200}
+                ) 
+            ),
 
             create_data_table(df)
             ],

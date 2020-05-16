@@ -4,7 +4,7 @@ import pandas as pd
 
 
 
-DEVELOPER_KEY = "api key"
+DEVELOPER_KEY = "AIzaSyDlYMAr75KG0XvYaaXDGMoN-rt1Kl2B1QU"
 
 YOUTUBE_API_SERVICE_NAME = "youtube"
 
