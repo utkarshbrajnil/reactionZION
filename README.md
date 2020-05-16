@@ -19,9 +19,9 @@ This is an web-app build on flask which analyses the sentiments of the crowd on 
 ```shell
 $ git clone https://github.com/utkarshbrajnil/reactionZION.git
 $ cd reactionZION
-$ python3 -m venv myenv
+$ python -m venv myenv
 $ source myenv/bin/activate
-$ pip3 install -r requirements.txt
+$ pip install -r requirements.txt
 $ flask run
 
 -----
