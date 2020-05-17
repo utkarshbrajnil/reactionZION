@@ -5,7 +5,7 @@ from flask import current_app as app
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
 from wtforms.validators import DataRequired
-from application.ytmain import ytload,twload
+from application.maindriver import ytload,twload
 from application import create_app,reload_app
 from multiprocessing import Process
 import os
@@ -50,11 +50,11 @@ def analyse():
     form=inputform()
     if form.is_submitted():
         #twload(form.query.data)
-        ytload(form.query.data)
-        #if __name__ == '__main__':
-        #    p = Process(target=twload, args=(form.query.data,))
-        #    p.start()
-        #    p.join()
+        #ytload(form.query.data)
+        if True:
+            p = Process(target=twload, args=(form.query.data,))
+            p.start()
+            p.join()
         app = create_app()
         if __name__ == "__main__":
             app.run(debug=True)

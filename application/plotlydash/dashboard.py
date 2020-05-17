@@ -33,24 +33,24 @@ def create_dashboard(server):
     conn = sqlite3.connect('data/alldata.db', isolation_level=None, check_same_thread=False)
     c = conn.cursor()
 
-    # Prepare a DataFrame
-    df = pd.read_sql('select * from sentiment', conn)
-    df['date'] = pd.to_datetime(df['unix'])
-    num_entries = df['id'].value_counts()
-    pol=list()
-    f_list=df['sentiment'].to_list()
-    for l in f_list:
-        if(l>0):
-            pol.append(1)
-        if(l<0):
-            pol.append(-1)
-        if(l==0):
-            pol.append(0)
-    df['polarity']=pol
+    # Prepare a youtube DataFrame------------------------------------------- ytdf
+    ytdf = pd.read_sql('select * from ytsentiment', conn)
+    ytdf['date'] = pd.to_datetime(ytdf['unix'])
+    num_entries = ytdf['id'].value_counts()
 
+
+    # Prepare a twitter DataFrame------------------------------------------- twdf
     twdf = pd.read_sql('select * from twsentiment', conn)
-    #twdf['date'] = pd.to_datetime(df['unix'])
+    twdf['date'] = pd.to_datetime(twdf['timestamp'])
     num_entries = twdf['id'].value_counts()
+
+
+    # Prepare a reddit DataFrame-------------------------------------------- rddf
+    rddf = pd.read_sql('select * from rdsentiment', conn)
+    rddf['date'] = pd.to_datetime(rddf['c_date'])
+    num_entries = rddf['id'].value_counts()
+
+
 
     # Custom HTML layout
     #dash_app.index_string = html_layout
@@ -64,81 +64,66 @@ def create_dashboard(server):
                     id='line-graph',
                     config={'displayModeBar': False},
                     animate= True,
-                    figure=px.line(df,
+                    figure=px.line(ytdf,
                                    x='date',
                                    y='sentiment',
                                    title='YOUTUBE sentiment analysis',
                                    ),
-                    style={'padding': 25, 'height':600}
+                    style={'padding': 0, 'height':600}
                 )
             ),
 
-             html.Div(
+            html.Div(
                 dcc.Graph(
                     id='bar-graph',
                     figure={
                         'data': [
                             {
-                                'x': df['date'],
-                                'y': df['sentiment'],
-                                'name': 'YOUTUBE sentiment analysis',
+                                'x': twdf['id'],
+                                'y': twdf['sentiment'],
+                                'name': 'TWITTER sentiment analysis',
                                 'type': 'bar'
                             }
                          ],
                         'layout': {
-                                'title': 'YOUTUBE sentiment analysis.',
+                                'title': 'TWITTER sentiment analysis.',
                                 'height': 600,
                                 'padding': 150
                         }
                     }),
                 ),
 
-                html.Div(
-                dcc.Graph(
-                    id='histo-graph',
-                    config={'displayModeBar': False},
-                    animate= True,
-                    figure=px.histogram(df,
-                                   y='date',
-                                   x='sentiment',
-                                   title='YOUTUBE sentiment analysis',
-                                   ),
-                    style={'padding': 25, 'height':600}
-                )
-            ),
-
             html.Div(
                 dcc.Graph(
                     id='scatter-graph',
                     config={'displayModeBar': False},
                     animate= True,
-                    figure=px.scatter(df,
-                                   x='date',
+                    figure=px.scatter(rddf,
+                                   x='c_date',
                                    y='sentiment',
-                                   title='YOUTUBE sentiment analysis',
+                                   title='REDDIT sentiment analysis',
                                    ),
                     style={'padding': 25, 'height':600}
                 )
             ),
-
+'''
             html.Div(
                 dcc.Graph(
                     id='pie-graph',
                     config={'displayModeBar': False},
                     animate= True,
-                    figure=px.pie(df,
+                    figure=px.pie(ytdf,
                                    values='sentiment',
                                    names='polarity',
                                    title='YOUTUBE sentiment analysis',
                                    ),
                     style={'padding': 25, 'height':1200}
                 )
-            ),
+            ),'''
 
             ],
 
         id='dash-container',
-
 
     )
 
