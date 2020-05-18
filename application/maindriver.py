@@ -66,20 +66,11 @@ def analyse_sentiment(df , term):
         if(l=="[removed]" or l=="[deleted]"):
             f_list.append(0)
 
-    negative=0.0
-    positive=0.0
-    neutral=0.0
-
-    pol=list()
+     pol=list()
 
     for l in f_list:
         if(l!=0):
             analysis=TextBlob(l).sentiment
-            #print (analysis)
-            if(analysis.polarity==0):
-                neutral+=1
-            elif(analysis.polarity>0):
-                positive+=1
             elif(analysis.polarity<0):
                 negative+=1
             t=analysis.polarity
@@ -87,6 +78,7 @@ def analyse_sentiment(df , term):
         else:
             pol.append(0)
     df['sentiment']=pol
+    df=df[df.sentiment != 0]
     return df
 
 def rdload(topic):
