@@ -66,13 +66,10 @@ def analyse_sentiment(df , term):
         if(l=="[removed]" or l=="[deleted]"):
             f_list.append(0)
 
-     pol=list()
-
+    pol=list()
     for l in f_list:
         if(l!=0):
             analysis=TextBlob(l).sentiment
-            elif(analysis.polarity<0):
-                negative+=1
             t=analysis.polarity
             pol.append(t)
         else:
