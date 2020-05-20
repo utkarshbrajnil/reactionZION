@@ -21,7 +21,7 @@ google-auth-httplib2==0.0.3
 googleapis-common-protos==1.51.0
 googletrans==2.4.0
 googletranslate==2.1.2
-httplib2==0.17.3
+httplib2==0.18.0
 idna==2.9
 is-disposable-email==1.0.0
 itsdangerous==1.1.0
